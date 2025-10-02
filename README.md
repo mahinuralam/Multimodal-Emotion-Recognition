@@ -1,12 +1,13 @@
-# TMNet: Transformer-Fused Multimodal Framework for Emotion Recognition
+# TMNet Multimodal Emotion Recognition
 
-## Overview
+TMNet fuses synchronous speech and EEG streams to classify affective state. Speech waveforms undergo pre-emphasis, Wiener denoising, VAD trimming, and MFCC±Δ extraction (40 coefficients, hop 256). EEG vectors are band-pass filtered (0.5–45 Hz), cleaned with FastICA, z-scored, and converted to sliding-window statistics (113 frames × 2 features). Dynamic Time Warping aligns both modalities before resampling to a common temporal grid.
 
-TMNet is an advanced multimodal emotion recognition framework that integrates **EEG** (Electroencephalography) signals and **speech signals** for emotion classification. It uses a **Transformer-based fusion** approach to combine outputs from **CNN-BiLSTM** (for speech) and **BiGRU** (for EEG), enhancing the system's ability to capture complex interdependencies between these modalities.
+The model stack comprises:
+- **Speech encoder:** CNN + BiLSTM stack that outputs 120-d frame embeddings.
+- **EEG encoder:** stacked BiGRU layers operating on the 2-channel statistical sequence.
+- **Fusion block:** Transformer cross-attention with LayerNorm and residual MLP for multimodal integration, followed by a 3-way softmax head (positive/neutral/negative).
 
-This framework leverages deep learning architectures to process and fuse the features from both EEG and speech signals, resulting in high-performance emotion recognition for applications in **human-computer interaction**, **psychology**, and **healthcare**.
-
-### The main contributions of this work include:
-- A **CNN-BiLSTM** model for processing speech signals.
-- A **BiGRU** model for EEG signal processing.
-- A **Transformer-driven fusion** approach that combines both modalities' outputs to improve emotion recognition accuracy.
+## Usage
+1. Open `TMNet_experiment copy.ipynb` and run the preprocessing cells to regenerate aligned tensors (`resampled_speech_sequences`, `resampled_eeg_sequences`, `resampled_labels`).
+2. Execute the fusion training section to fine-tune encoders and the transformer head; monitor accuracy/curves stored in the notebook outputs.
+3. Adapt downstream evaluation cells to export confusion matrices or saved weights (`.h5`) for deployment.
