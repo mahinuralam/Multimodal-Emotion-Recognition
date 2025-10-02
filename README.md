@@ -11,3 +11,7 @@ The model stack comprises:
 1. Open `TMNet_experiment copy.ipynb` and run the preprocessing cells to regenerate aligned tensors (`resampled_speech_sequences`, `resampled_eeg_sequences`, `resampled_labels`).
 2. Execute the fusion training section to fine-tune encoders and the transformer head; monitor accuracy/curves stored in the notebook outputs.
 3. Adapt downstream evaluation cells to export confusion matrices or saved weights (`.h5`) for deployment.
+
+## Published Paper
+
+https://www.sciencedirect.com/science/article/pii/S2405959525000517
