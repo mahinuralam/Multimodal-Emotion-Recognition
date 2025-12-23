@@ -15,3 +15,22 @@ The model stack comprises:
 ## Published Paper
 
 https://www.sciencedirect.com/science/article/pii/S2405959525000517
+
+
+## Citation
+
+If you find this repository useful, please cite our paper:
+
+```bibtex
+@article{alam2025tmnet,
+  title={TMNet: Transformer-fused multimodal framework for emotion recognition via EEG and speech},
+  author={Alam, Md Mahinur and Dini, Mohamed A and Kim, Dong-Seong and Jun, Taesoo},
+  journal={ICT Express},
+  year={2025},
+  publisher={Elsevier}
+}
+
+
+
+
+
