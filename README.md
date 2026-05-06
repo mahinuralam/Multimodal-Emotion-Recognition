@@ -39,11 +39,6 @@ TMNet fuses **speech** and **EEG** signals to classify emotions into **Positive*
 
 ## Results
 
-<p align="center">
-  <img src="assets/fig5_confusion_matrix.png" alt="Fig. 5 — Confusion matrix comparison" width="850"/>
-</p>
-<p align="center"><em>Fig. 5. Comparison of BiGRU with state-of-the-art models.</em></p>
-
 | Model | Method | Accuracy (%) | Precision (%) | Recall (%) | F1 Score (%) |
 |-------|--------|:---:|:---:|:---:|:---:|
 | Multimodal Transformer [5] | Transformer, SVM | 91.79 | 92.00 | 91.50 | 91.70 |
