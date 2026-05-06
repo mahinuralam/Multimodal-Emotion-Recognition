@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from scipy.signal import butter, filtfilt
+from scipy.signal import butter, filtfilt, welch
 from scipy.stats import zscore
 from numpy.lib.stride_tricks import sliding_window_view
 from sklearn.decomposition import FastICA
@@ -9,9 +9,17 @@ from tensorflow.keras.utils import to_categorical
 
 LABEL_ENCODING = {"NEUTRAL": 0, "POSITIVE": 1, "NEGATIVE": 2}
 FS = 128
-WINDOW_SIZE = 128
-STEP = 64
+WINDOW_SIZE = 128   # 1-second window at 128 Hz
+STEP = 64           # 50% overlap
 N_ICA_COMPONENTS = 8
+
+# Emotion-specific frequency bands (paper, Section 3)
+# Neutral: 5–25 Hz | Negative: broadband 0.5–45 Hz | Positive: high-freq 25–45 Hz
+FREQ_BANDS = {
+    "neutral":  (5.0,  25.0),
+    "negative": (0.5,  45.0),
+    "positive": (25.0, 45.0),
+}
 
 
 def butter_bandpass(
@@ -34,6 +42,7 @@ def bandpass_filter(
 
 
 def run_fast_ica(signal: np.ndarray, n_components: int = N_ICA_COMPONENTS) -> np.ndarray:
+    """Remove artifacts (muscle movement, eye blinks) via FastICA."""
     length = signal.shape[0]
     pad = (n_components - (length % n_components)) % n_components
     if pad > 0:
@@ -49,32 +58,54 @@ def run_fast_ica(signal: np.ndarray, n_components: int = N_ICA_COMPONENTS) -> np
     return cleaned
 
 
+def extract_psd_band_features(window: np.ndarray, fs: float = FS) -> np.ndarray:
+    """Compute mean Power Spectral Density in each emotion-specific frequency band.
+
+    Bands (paper, Section 3):
+        neutral:  5–25 Hz
+        negative: 0.5–45 Hz (broadband)
+        positive: 25–45 Hz  (high-frequency)
+
+    Returns:
+        ndarray of shape (3,) — one mean PSD value per band
+    """
+    nperseg = min(len(window), WINDOW_SIZE)
+    freqs, psd = welch(window, fs=fs, nperseg=nperseg)
+    features = []
+    for low, high in FREQ_BANDS.values():
+        idx = np.where((freqs >= low) & (freqs <= high))[0]
+        features.append(np.mean(psd[idx]) if len(idx) > 0 else 0.0)
+    return np.array(features, dtype=np.float32)
+
+
 def preprocess_eeg_sample(
     raw_vector: np.ndarray,
     fs: float = FS,
     window_size: int = WINDOW_SIZE,
     step: int = STEP,
 ) -> np.ndarray:
-    """Full EEG preprocessing pipeline for a single sample.
+    """Full EEG preprocessing pipeline for a single sample (paper, Section 3).
 
-    Pipeline: band-pass filter → FastICA artifact removal → z-score →
-              sliding-window statistics (mean, std).
+    Pipeline:
+        1. Band-pass filter (0.5–45 Hz)
+        2. FastICA — artifact removal (muscle movements, eye blinks)
+        3. Z-score normalisation (zero mean, unit variance)
+        4. Segment into overlapping 1-second windows (50% overlap)
+        5. Extract PSD features in emotion-specific frequency bands
 
     Returns:
-        ndarray of shape (time_frames, 2)
+        ndarray of shape (time_frames, 3) — one PSD feature per band per window
     """
     filtered = bandpass_filter(raw_vector, 0.5, 45.0, fs=fs)
     cleaned = run_fast_ica(filtered)
     normalized = zscore(cleaned)
-    if normalized.ndim == 1:
-        if normalized.size < window_size:
-            padded = np.pad(normalized, (0, window_size - normalized.size), mode="edge")
-            windowed = sliding_window_view(padded, window_shape=window_size)[::step]
-        else:
-            windowed = sliding_window_view(normalized, window_shape=window_size)[::step]
-    else:
-        windowed = sliding_window_view(normalized, window_shape=window_size, axis=0)[::step]
-    return np.stack([windowed.mean(axis=1), windowed.std(axis=1)], axis=-1)
+
+    if normalized.size < window_size:
+        normalized = np.pad(normalized, (0, window_size - normalized.size), mode="edge")
+
+    windows = sliding_window_view(normalized, window_shape=window_size)[::step]
+    features = np.stack([extract_psd_band_features(w, fs=fs) for w in windows], axis=0)
+    return features  # (time_frames, 3)
 
 
 def Transform_data(
