@@ -50,7 +50,7 @@ The model stack consists of three components:
 
 ## Results
 
-### Comparison with Existing Approaches (Table 4)
+### Comparison with Existing Approaches
 
 | Model | Method | Accuracy (%) | Precision (%) | Recall (%) | F1 Score (%) |
 |-------|--------|:---:|:---:|:---:|:---:|
