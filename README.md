@@ -50,11 +50,6 @@ The model stack consists of three components:
 
 ## Results
 
-<p align="center">
-  <img src="assets/fig5_confusion_matrix.png" alt="Fig. 5 — Confusion matrix comparison" width="850"/>
-</p>
-<p align="center"><em>Fig. 5. Comparison of the proposed BiGRU with state-of-the-art models.</em></p>
-
 ### Comparison with Existing Approaches (Table 4)
 
 | Model | Method | Accuracy (%) | Precision (%) | Recall (%) | F1 Score (%) |
@@ -168,38 +163,6 @@ Run the cells in order:
 | 6. Fusion Training | Train TMNet, save to `Model/multimodal_model.keras` |
 | 7. Evaluation | Generate confusion matrices and classification reports |
 
-### Using the Python modules directly
-
-```python
-from src.preprocessing.speech import preprocess_speech_file
-from src.preprocessing.eeg import preprocess_eeg_sample, Transform_data
-from src.models.speech_model import build_speech_model
-from src.models.eeg_model import build_eeg_model
-from src.models.fusion_model import build_fusion_model
-from src.utils.alignment import dtw_align_pair, resample_aligned_sequences
-from src.utils.augmentation import augment_dataset
-from src.data.loader import load_speech_dataset, load_eeg_dataset
-
-# Load datasets
-X_speech, y_speech, file_paths = load_speech_dataset("Datasets/Speech/")
-eeg_df = load_eeg_dataset("Datasets/EEG/emotions.csv")
-X_eeg, Y_eeg, X_eeg_raw = Transform_data(eeg_df)
-
-# Build individual models
-speech_model = build_speech_model(max_len=500, num_mfcc=40, num_classes=5)
-eeg_model = build_eeg_model(input_timesteps=X_eeg.shape[1], input_features=X_eeg.shape[2])
-
-# Build the multimodal fusion model
-fusion_model = build_fusion_model(speech_model, eeg_model, num_classes=3)
-```
-
-### Monitoring training with TensorBoard
-
-```bash
-tensorboard --logdir logs_multimodal
-```
-
-Available log directories: `logs/`, `logs_2/`, `logs_improved/`, `logs_multimodal/`.
 
 ---
 
@@ -220,7 +183,3 @@ If you use this code or the TMNet architecture in your research, please cite:
 ```
 
 ---
-
-## License
-
-This project is released for academic and research use. Please refer to the [published paper](https://www.sciencedirect.com/science/article/pii/S2405959525000517) for full details on methodology and experimental setup.
