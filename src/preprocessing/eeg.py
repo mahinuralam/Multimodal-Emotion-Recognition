@@ -84,7 +84,7 @@ def preprocess_eeg_sample(
     window_size: int = WINDOW_SIZE,
     step: int = STEP,
 ) -> np.ndarray:
-    """Full EEG preprocessing pipeline for a single sample (paper, Section 3).
+    """Full EEG preprocessing pipeline for a single sample.
 
     Pipeline:
         1. Band-pass filter (0.5–45 Hz)
