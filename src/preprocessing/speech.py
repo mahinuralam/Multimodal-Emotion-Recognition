@@ -16,7 +16,7 @@ def spectral_subtraction(
     alpha: float = 2.0,
     beta: float = 0.01,
 ) -> np.ndarray:
-    """Reduce background noise via spectral subtraction (as described in paper).
+    """Reduce background noise via spectral subtraction.
 
     Estimates noise from the first `noise_frames` STFT frames (assumed to be
     silence/noise-only) and subtracts it from the full magnitude spectrum.
@@ -57,7 +57,7 @@ def preprocess_speech_file(
     hop_length: int = HOP_LENGTH,
     n_fft: int = N_FFT,
 ) -> np.ndarray:
-    """Load and preprocess a single audio file following the paper pipeline.
+    """Load and preprocess a single audio file.
 
     Pipeline (Section 3, paper):
         1. Load and resample to 22,050 Hz
