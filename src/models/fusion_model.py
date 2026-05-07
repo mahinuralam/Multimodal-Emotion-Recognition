@@ -34,7 +34,7 @@ def transformer_encoder_block(
     ff_units: int = FF_UNITS,
     dropout_rate: float = DROPOUT_RATE,
 ) -> tf.Tensor:
-    """Single Transformer encoder block as described in the paper (Section 3.3).
+    """Single Transformer encoder block.
 
     Structure (paper):
         1. Multi-head self-attention — Q, K, V projections;
