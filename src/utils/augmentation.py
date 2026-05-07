@@ -3,7 +3,7 @@ import numpy as np
 
 
 def apply_time_mask(mfcc: np.ndarray, max_mask_size: int = 40) -> np.ndarray:
-    """Zero out a random contiguous block of time frames (SpecAugment-style)."""
+    """Zero out a random contiguous block of time frames."""
     mfcc = mfcc.copy()
     mask_size = np.random.randint(1, max_mask_size)
     start = np.random.randint(0, mfcc.shape[0] - mask_size)
